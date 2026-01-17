@@ -3,10 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TroyNet Nuke Bot</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>TroyNet Nuke Bot - Web Interface</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            
+            --border-color: #475569;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #7c3aed, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .version {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-left: 10px;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Styles */
+        .control-panel,
+        .status-panel,
+        .logs-panel {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.7);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* Form Styles */
+        .control-panel {
+            padding: 0;
+        }
+
+        .form-group {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-group:last-of-type {
+            border-bottom: none;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .input-with-toggle {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+        }
+
+        .toggle-visibility {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            transition: var(--transition);
+        }
+
+        .toggle-visibility:hover {
+            color: var(--text-primary);
+        }
+
+        /* Mode Selector */
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .mode-option {
+            padding: 15px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mode-option:hover {
+            border-color: var(--primary);
+        }
+
+        .mode-option.active {
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .mode-option i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        /* Buttons */
+        .buttons {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-icon {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-icon.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--danger);
+            font-weight: 500;
+        }
+
+        .warning-box i {
+            font-size: 1.2rem;
+        }
+
+        /* Status Panel */
+        .status-panel > div:not(.panel-header) {
+            padding: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: var(--bg-primary);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .status-dot.idle {
+            background: var(--text-muted);
+        }
+
+        .status-dot.running {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.error {
+            background: var(--danger);
+        }
+
+        .status-dot.completed {
+            background: var(--info);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-primary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .current-action,
+        .current-server {
+            margin-top: 20px;
+        }
+
+        .current-action h3,
+        .current-server h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-text,
+        .server-text {
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Logs Panel */
+        .logs-panel {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+
+        .logs-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--bg-primary);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid var(--text-muted);
+            background: rgba(30, 41, 59, 0.5);
+            display: flex;
+            gap: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            min-width: 70px;
+        }
+
+        .log-entry.info {
+            border-left-color: var(--info);
+        }
+
+        .log-entry.success {
+            border-left-color: var(--success);
+        }
+
+        .log-entry.error {
+            border-left-color: var(--danger);
+        }
+
+        .log-entry.warning {
+            border-left-color: var(--warning);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .made-by {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -53,7 +575,7 @@
                     </div>
                     
                     <div class="mode-selector">
-                        <div class="mode-option" data-mode="all">
+                        <div class="mode-option active" data-mode="all">
                             <i class="fas fa-globe"></i>
                             <span>Nuke All Servers</span>
                         </div>
@@ -122,7 +644,6 @@
                     </div>
                 </div>
                 <div class="logs-container" id="logsContainer">
-                    <!-- Logs will appear here -->
                     <div class="log-entry info">
                         <span class="log-time">00:00:00</span>
                         <span class="log-message">System initialized. Ready to start.</span>
@@ -143,6 +664,291 @@
         </footer>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        class TroyNetWeb {
+            constructor() {
+                this.statusPollInterval = null;
+                this.autoScroll = true;
+                this.currentMode = 'all';
+                this.status = {
+                    running: false,
+                    current_action: '',
+                    progress: 0,
+                    logs: [],
+                    current_guild: '',
+                    completed: false,
+                    error: null
+                };
+                
+                this.initEventListeners();
+                this.initSimulation();
+            }
+            
+            initEventListeners() {
+                // Toggle token visibility
+                document.getElementById('toggleToken').addEventListener('click', () => {
+                    const tokenInput = document.getElementById('token');
+                    const toggleIcon = document.getElementById('toggleToken').querySelector('i');
+                    
+                    if (tokenInput.type === 'password') {
+                        tokenInput.type = 'text';
+                        toggleIcon.className = 'fas fa-eye-slash';
+                    } else {
+                        tokenInput.type = 'password';
+                        toggleIcon.className = 'fas fa-eye';
+                    }
+                });
+                
+                // Mode selector
+                document.querySelectorAll('.mode-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        document.querySelectorAll('.mode-option').forEach(opt => {
+                            opt.classList.remove('active');
+                        });
+                        option.classList.add('active');
+                        this.currentMode = option.dataset.mode;
+                        
+                        const guildIdInput = document.getElementById('guildId');
+                        if (this.currentMode === 'specific') {
+                            guildIdInput.placeholder = 'Enter server ID to nuke';
+                            guildIdInput.disabled = false;
+                        } else {
+                            guildIdInput.placeholder = 'Leave empty to nuke all servers';
+                            guildIdInput.value = '';
+                            guildIdInput.disabled = true;
+                        }
+                    });
+                });
+                
+                // Set default mode
+                document.querySelector('.mode-option[data-mode="all"]').classList.add('active');
+                
+                // Start button
+                document.getElementById('startBtn').addEventListener('click', () => this.startNuke());
+                
+                // Stop button
+                document.getElementById('stopBtn').addEventListener('click', () => this.stopNuke());
+                
+                // Clear logs button
+                document.getElementById('clearBtn').addEventListener('click', () => this.clearLogs());
+                
+                // Auto-scroll button
+                document.getElementById('autoScrollBtn').addEventListener('click', (e) => {
+                    this.autoScroll = !this.autoScroll;
+                    e.target.classList.toggle('active');
+                });
+                
+                // Enter key to start
+                document.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !document.getElementById('startBtn').disabled) {
+                        this.startNuke();
+                    }
+                });
+            }
+            
+            initSimulation() {
+                // Simulate backend status updates
+                setInterval(() => this.updateStatusDisplay(), 1000);
+            }
+            
+            async startNuke() {
+                const token = document.getElementById('token').value.trim();
+                const channelName = document.getElementById('channelName').value.trim() || 'NUKED';
+                const guildId = document.getElementById('guildId').value.trim();
+                
+                if (!token) {
+                    this.addLog('Error: Bot token is required', 'error');
+                    return;
+                }
+                
+                if (!token.startsWith('MT') && !token.startsWith('Nz') && !token.startsWith('OD')) {
+                    this.addLog('Warning: Token format looks incorrect. Should start with MT, Nz, or OD', 'warning');
+                }
+                
+                // Disable start button and enable stop button
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                
+                // Reset status
+                this.status = {
+                    running: true,
+                    current_action: 'Initializing bot connection...',
+                    progress: 0,
+                    logs: [],
+                    current_guild: '',
+                    completed: false,
+                    error: null
+                };
+                
+                this.addLog('Starting nuke operation...', 'info');
+                this.addLog(`Token: ${token.substring(0, 10)}...${token.substring(token.length - 5)}`, 'info');
+                this.addLog(`Channel name: ${channelName}`, 'info');
+                
+                if (this.currentMode === 'specific' && guildId) {
+                    this.addLog(`Target server ID: ${guildId}`, 'info');
+                } else {
+                    this.addLog('Target: All servers', 'info');
+                }
+                
+                // Simulate the nuke process
+                this.simulateNukeProcess(token, channelName, guildId);
+            }
+            
+            simulateNukeProcess(token, channelName, guildId) {
+                const actions = [
+                    { action: 'Connecting to Discord...', delay: 1000, progress: 10 },
+                    { action: 'Fetching server list...', delay: 1500, progress: 20 },
+                    { action: 'Banning members...', delay: 2000, progress: 40 },
+                    { action: 'Deleting channels...', delay: 1500, progress: 60 },
+                    { action: 'Deleting roles...', delay: 1000, progress: 80 },
+                    { action: 'Creating new channels...', delay: 1500, progress: 100 }
+                ];
+                
+                let currentActionIndex = 0;
+                
+                const executeAction = () => {
+                    if (currentActionIndex >= actions.length || !this.status.running) {
+                        if (this.status.running) {
+                            this.status.completed = true;
+                            this.status.running = false;
+                            this.status.current_action = 'Nuke completed successfully!';
+                            
+                            this.addLog('Nuke operation completed successfully!', 'success');
+                            this.addLog('All targeted servers have been nuked.', 'success');
+                            this.addLog('WARNING: This action is irreversible.', 'warning');
+                            
+                            document.getElementById('startBtn').disabled = false;
+                            document.getElementById('stopBtn').disabled = true;
+                        }
+                        return;
+                    }
+                    
+                    const currentAction = actions[currentActionIndex];
+                    this.status.current_action = currentAction.action;
+                    this.status.progress = currentAction.progress;
+                    
+                    this.addLog(currentAction.action, 'info');
+                    
+                    if (currentActionIndex === 2) {
+                        this.addLog('Banned 42 members', 'success');
+                    } else if (currentActionIndex === 3) {
+                        this.addLog('Deleted 15 channels', 'success');
+                    } else if (currentActionIndex === 4) {
+                        this.addLog('Deleted 8 roles', 'success');
+                    } else if (currentActionIndex === 5) {
+                        this.addLog(`Created 25 channels named "${channelName}"`, 'success');
+                    }
+                    
+                    currentActionIndex++;
+                    
+                    if (this.status.running) {
+                        setTimeout(executeAction, currentAction.delay);
+                    }
+                };
+                
+                // Set initial server name
+                if (this.currentMode === 'specific' && guildId) {
+                    this.status.current_guild = `Server #${guildId}`;
+                } else {
+                    this.status.current_guild = 'Multiple servers';
+                }
+                
+                setTimeout(executeAction, 500);
+            }
+            
+            stopNuke() {
+                this.status.running = false;
+                this.status.current_action = 'Stopping nuke operation...';
+                
+                this.addLog('Stop command received', 'warning');
+                this.addLog('Nuke operation stopped by user', 'warning');
+                
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+            }
+            
+            clearLogs() {
+                const logsContainer = document.getElementById('logsContainer');
+                logsContainer.innerHTML = '<div class="log-entry info"><span class="log-time">' + 
+                    this.getCurrentTime() + '</span><span class="log-message">Logs cleared</span></div>';
+            }
+            
+            updateStatusDisplay() {
+                // Update status indicator
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('.status-text');
+                const statusIndicator = document.getElementById('statusIndicator');
+                
+                if (this.status.running) {
+                    statusDot.className = 'status-dot running';
+                    statusText.textContent = 'RUNNING';
+                    statusIndicator.style.color = '#10b981';
+                } else if (this.status.error) {
+                    statusDot.className = 'status-dot error';
+                    statusText.textContent = 'ERROR';
+                    statusIndicator.style.color = '#ef4444';
+                } else if (this.status.completed) {
+                    statusDot.className = 'status-dot completed';
+                    statusText.textContent = 'COMPLETED';
+                    statusIndicator.style.color = '#3b82f6';
+                } else {
+                    statusDot.className = 'status-dot idle';
+                    statusText.textContent = 'IDLE';
+                    statusIndicator.style.color = '#94a3b8';
+                }
+                
+                // Update progress
+                document.getElementById('progressPercent').textContent = `${this.status.progress}%`;
+                document.getElementById('progressFill').style.width = `${this.status.progress}%`;
+                
+                // Update current action
+                document.getElementById('currentAction').textContent = this.status.current_action || 'Waiting...';
+                
+                // Update current server
+                document.getElementById('currentServer').textContent = this.status.current_guild || 'None';
+                
+                // Auto-scroll to bottom
+                if (this.autoScroll) {
+                    const logsContainer = document.getElementById('logsContainer');
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+            }
+            
+            addLog(message, type = 'info') {
+                const timeString = this.getCurrentTime();
+                
+                const logsContainer = document.getElementById('logsContainer');
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                logEntry.innerHTML = `
+                    <span class="log-time">${timeString}</span>
+                    <span class="log-message">${message}</span>
+                `;
+                
+                logsContainer.appendChild(logEntry);
+                
+                // Limit logs to 100 entries
+                const allLogs = logsContainer.querySelectorAll('.log-entry');
+                if (allLogs.length > 100) {
+                    allLogs[0].remove();
+                }
+                
+                // Auto-scroll to bottom
+                if (this.autoScroll) {
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+            }
+            
+            getCurrentTime() {
+                const now = new Date();
+                return now.toTimeString().split(' ')[0];
+            }
+        }
+        
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.troyNet = new TroyNetWeb();
+        });
+    </script>
 </body>
-</html>
+                                </html>
