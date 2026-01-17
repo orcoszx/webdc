@@ -3,32 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TroyNet Nuke Bot - Web Interface</title>
+    <title>TroyNet Nuke Bot v1.2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #7c3aed;
-            --primary-dark: #6d28d9;
-            --danger: #ef4444;
-            --danger-dark: #dc2626;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --info: #3b82f6;
+            --primary: #ff2a6d;
+            --primary-dark: #d91a5c;
+            --secondary: #05d9e8;
+            --accent: #ff2a6d;
+            --danger: #ff2a6d;
+            --success: #00ff9d;
+            --warning: #ffd166;
+            --info: #05d9e8;
             
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
+            --bg-dark: #0c0e1c;
+            --bg-darker: #050711;
+            --bg-panel: #12142b;
+            --bg-card: #1a1c35;
             
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #94a3b8;
+            --text-primary: #ffffff;
+            --text-secondary: #b8b9d6;
+            --text-muted: #6b6d8c;
             
-            --border-color: #475569;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --border-color: #2a2c45;
+            --border-glow: rgba(255, 42, 109, 0.3);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 20px rgba(255, 42, 109, 0.2);
             
             --border-radius: 12px;
-            --transition: all 0.3s ease;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -39,60 +44,172 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, var(--bg-darker) 0%, var(--bg-dark) 100%);
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(5, 217, 232, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(5, 217, 232, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--secondary), transparent);
+            opacity: 0.1;
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--secondary);
+            animation: glitch-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: 2px 0 var(--primary);
+            animation: glitch-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-1 {
+            0% { clip-path: inset(40% 0 61% 0); }
+            100% { clip-path: inset(92% 0 1% 0); }
+        }
+
+        @keyframes glitch-2 {
+            0% { clip-path: inset(25% 0 58% 0); }
+            100% { clip-path: inset(80% 0 6% 0); }
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         /* Header */
         .header {
             text-align: center;
             margin-bottom: 40px;
-            padding: 20px;
-            background: rgba(30, 41, 59, 0.7);
+            padding: 30px;
+            background: rgba(18, 20, 43, 0.8);
             border-radius: var(--border-radius);
             border: 1px solid var(--border-color);
             backdrop-filter: blur(10px);
+            box-shadow: var(--shadow), var(--glow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .logo {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 20px;
+            margin-bottom: 15px;
         }
 
         .logo-icon {
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .logo h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #7c3aed, #3b82f6);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .version {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 1rem;
-            color: var(--text-muted);
+            color: var(--secondary);
             margin-left: 10px;
+            padding: 4px 12px;
+            background: rgba(5, 217, 232, 0.1);
+            border-radius: 20px;
+            border: 1px solid var(--secondary);
         }
 
         .tagline {
+            font-family: 'JetBrains Mono', monospace;
             color: var(--text-secondary);
             font-size: 1.1rem;
-            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .terminal-ascii {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-top: 20px;
+            line-height: 1.2;
+            opacity: 0.8;
         }
 
         /* Main Content */
@@ -118,38 +235,61 @@
         .control-panel,
         .status-panel,
         .logs-panel {
-            background: var(--bg-secondary);
+            background: var(--bg-panel);
             border-radius: var(--border-radius);
             border: 1px solid var(--border-color);
             overflow: hidden;
             box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .control-panel::before,
+        .status-panel::before,
+        .logs-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 42, 109, 0.05) 50%, transparent 70%);
+            pointer-events: none;
         }
 
         .panel-header {
             padding: 20px;
-            background: rgba(15, 23, 42, 0.7);
+            background: linear-gradient(90deg, rgba(255, 42, 109, 0.1), rgba(5, 217, 232, 0.1));
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+        }
+
+        .panel-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .panel-header h2 {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 1.3rem;
             font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         /* Form Styles */
-        .control-panel {
-            padding: 0;
-        }
-
         .form-group {
             padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
         }
 
         .form-group:last-of-type {
@@ -158,39 +298,43 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 500;
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
         }
 
         .hint {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             font-weight: 400;
+            margin-left: auto;
         }
 
         .input-with-toggle {
             position: relative;
         }
 
-        input {
+        input, select, textarea {
             width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-primary);
+            padding: 14px 16px;
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--border-radius-sm);
             color: var(--text-primary);
             font-size: 1rem;
             transition: var(--transition);
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        input:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 42, 109, 0.2), 0 0 20px rgba(255, 42, 109, 0.1);
         }
 
         .toggle-visibility {
@@ -202,12 +346,14 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            padding: 5px;
+            padding: 8px;
+            border-radius: 6px;
             transition: var(--transition);
         }
 
         .toggle-visibility:hover {
-            color: var(--text-primary);
+            color: var(--primary);
+            background: rgba(255, 42, 109, 0.1);
         }
 
         /* Mode Selector */
@@ -216,35 +362,43 @@
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .mode-option {
-            padding: 15px;
-            background: var(--bg-primary);
+            padding: 20px;
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: var(--border-radius-sm);
             text-align: center;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .mode-option:hover {
             border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 42, 109, 0.2);
         }
 
         .mode-option.active {
             border-color: var(--primary);
-            background: rgba(124, 58, 237, 0.1);
+            background: linear-gradient(135deg, rgba(255, 42, 109, 0.1), rgba(5, 217, 232, 0.1));
+            box-shadow: 0 0 20px rgba(255, 42, 109, 0.2);
         }
 
         .mode-option i {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--primary);
+        }
+
+        .mode-option span {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
         }
 
         /* Buttons */
@@ -256,9 +410,9 @@
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--border-radius-sm);
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
@@ -266,9 +420,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             flex: 1;
-            min-width: 120px;
+            min-width: 140px;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
@@ -278,56 +452,62 @@
 
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 10px 20px rgba(255, 42, 109, 0.3);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+            background: linear-gradient(135deg, var(--danger), #c2185b);
             color: white;
         }
 
         .btn-secondary {
-            background: var(--bg-tertiary);
+            background: var(--bg-card);
             color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
         }
 
         .btn-icon {
-            padding: 8px 16px;
-            background: var(--bg-tertiary);
+            padding: 10px 20px;
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: var(--border-radius-sm);
             color: var(--text-secondary);
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .btn-icon.active {
             background: var(--primary);
             color: white;
+            border-color: var(--primary);
         }
 
         /* Warning Box */
         .warning-box {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
-            border-top: 1px solid var(--border-color);
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 42, 109, 0.1), rgba(220, 38, 38, 0.1));
+            border-top: 1px solid rgba(255, 42, 109, 0.3);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             color: var(--danger);
             font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .warning-box i {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+            color: var(--danger);
         }
 
         /* Status Panel */
@@ -338,18 +518,32 @@
         .status-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 6px 12px;
-            background: var(--bg-primary);
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--bg-card);
             border-radius: 20px;
             border: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: var(--text-muted);
+            position: relative;
+        }
+
+        .status-dot::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .status-dot.idle {
@@ -358,21 +552,35 @@
 
         .status-dot.running {
             background: var(--success);
-            animation: pulse 2s infinite;
+        }
+
+        .status-dot.running::after {
+            opacity: 1;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse-glow 2s infinite;
         }
 
         .status-dot.error {
             background: var(--danger);
         }
 
-        .status-dot.completed {
-            background: var(--info);
+        .status-dot.error::after {
+            opacity: 1;
+            box-shadow: 0 0 10px var(--danger);
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        .status-dot.completed {
+            background: var(--secondary);
+        }
+
+        .status-dot.completed::after {
+            opacity: 1;
+            box-shadow: 0 0 10px var(--secondary);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
         }
 
         .status-text {
@@ -382,110 +590,174 @@
 
         /* Progress Bar */
         .progress-container {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .progress-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 0.9rem;
             color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .progress-bar {
-            height: 10px;
-            background: var(--bg-primary);
-            border-radius: 5px;
+            height: 12px;
+            background: var(--bg-card);
+            border-radius: 6px;
             overflow: hidden;
+            border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--info));
-            border-radius: 5px;
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
         }
 
         .current-action,
-        .current-server {
+        .current-server,
+        .stats {
             margin-top: 20px;
         }
 
         .current-action h3,
-        .current-server h3 {
+        .current-server h3,
+        .stats h3 {
             font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .action-text,
         .server-text {
-            padding: 12px;
-            background: var(--bg-primary);
-            border-radius: 8px;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-sm);
             border: 1px solid var(--border-color);
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
-            min-height: 46px;
+            min-height: 50px;
             display: flex;
             align-items: center;
+            color: var(--secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-item {
+            padding: 12px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         /* Logs Panel */
         .logs-panel {
             display: flex;
             flex-direction: column;
-            height: 400px;
+            height: 500px;
         }
 
         .logs-container {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: var(--bg-primary);
-            font-family: 'Monaco', 'Courier New', monospace;
+            background: var(--bg-card);
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
         }
 
         .log-entry {
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            border-left: 3px solid var(--text-muted);
-            background: rgba(30, 41, 59, 0.5);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius-sm);
+            border-left: 4px solid var(--text-muted);
+            background: rgba(26, 28, 53, 0.8);
             display: flex;
             gap: 15px;
-            animation: fadeIn 0.3s ease;
+            animation: slideIn 0.3s ease;
+            border: 1px solid transparent;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .log-time {
-            color: var(--text-muted);
-            min-width: 70px;
+            color: var(--secondary);
+            min-width: 80px;
+            font-size: 0.8rem;
         }
 
         .log-entry.info {
             border-left-color: var(--info);
+            border-color: rgba(5, 217, 232, 0.2);
         }
 
         .log-entry.success {
             border-left-color: var(--success);
+            border-color: rgba(0, 255, 157, 0.2);
         }
 
         .log-entry.error {
             border-left-color: var(--danger);
+            border-color: rgba(255, 42, 109, 0.2);
         }
 
         .log-entry.warning {
             border-left-color: var(--warning);
+            border-color: rgba(255, 209, 102, 0.2);
+        }
+
+        .log-entry.critical {
+            border-left-color: var(--primary);
+            border-color: rgba(255, 42, 109, 0.3);
+            background: linear-gradient(90deg, rgba(255, 42, 109, 0.1), transparent);
         }
 
         /* Footer */
@@ -496,6 +768,7 @@
             color: var(--text-muted);
             font-size: 0.9rem;
             border-top: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .footer-content {
@@ -507,53 +780,88 @@
         .made-by {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: var(--text-secondary);
+        }
+
+        .version-info {
+            color: var(--text-muted);
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
+            background: var(--bg-card);
+            border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--bg-tertiary);
-            border-radius: 4px;
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 5px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            background: linear-gradient(var(--primary-dark), var(--secondary));
+        }
+
+        /* Console Effect */
+        .console-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15) 0px,
+                    rgba(0, 0, 0, 0.15) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
         }
     </style>
 </head>
 <body>
+    <div class="cyber-grid"></div>
+    <div class="scanline"></div>
+    <div class="console-effect"></div>
+
     <div class="container">
         <header class="header">
             <div class="logo">
                 <div class="logo-icon">⚡</div>
-                <h1>TroyNet <span class="version">v1.2 Web</span></h1>
+                <h1 class="glitch" data-text="TROYNET">TROYNET</h1>
+                <div class="version">v1.2</div>
             </div>
-            <div class="tagline">Discord Server Management Tool</div>
+            <div class="tagline">DISCORD SERVER MANAGEMENT TOOL</div>
+            <div class="terminal-ascii">
+                > SYSTEM: ONLINE | MODE: CYBER | STATUS: READY<br>
+                > INITIALIZING NUKER PROTOCOL v1.2<br>
+                > [████████████████████] 100%
+            </div>
         </header>
 
         <main class="main-content">
             <div class="dashboard">
                 <div class="control-panel">
                     <div class="panel-header">
-                        <h2><i class="fas fa-cogs"></i> Control Panel</h2>
+                        <h2><i class="fas fa-terminal"></i> CONTROL PANEL</h2>
                     </div>
                     
                     <div class="form-group">
                         <label for="token">
-                            <i class="fas fa-key"></i> Bot Token
-                            <span class="hint">(Get from Discord Developer Portal)</span>
+                            <i class="fas fa-key"></i> BOT TOKEN
+                            <span class="hint">MTxxxx or Nzxxxx format</span>
                         </label>
                         <div class="input-with-toggle">
-                            <input type="password" id="token" placeholder="Enter your bot token">
+                            <input type="password" id="token" placeholder="MTxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
                             <button type="button" class="toggle-visibility" id="toggleToken">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -562,50 +870,50 @@
                     
                     <div class="form-group">
                         <label for="channelName">
-                            <i class="fas fa-hashtag"></i> Channel/Role Name
+                            <i class="fas fa-hashtag"></i> CHANNEL/ROLE NAME
                         </label>
-                        <input type="text" id="channelName" placeholder="Enter name for channels/roles" value="NUKED">
+                        <input type="text" id="channelName" value="NUKED-BY-TROYNET">
                     </div>
                     
                     <div class="form-group">
                         <label for="guildId">
-                            <i class="fas fa-server"></i> Server ID (Optional)
+                            <i class="fas fa-server"></i> SERVER ID (OPTIONAL)
                         </label>
-                        <input type="text" id="guildId" placeholder="Leave empty to nuke all servers">
+                        <input type="text" id="guildId" placeholder="Leave empty for ALL servers">
                     </div>
                     
                     <div class="mode-selector">
                         <div class="mode-option active" data-mode="all">
-                            <i class="fas fa-globe"></i>
-                            <span>Nuke All Servers</span>
+                            <i class="fas fa-globe-americas"></i>
+                            <span>NUKE ALL SERVERS</span>
                         </div>
                         <div class="mode-option" data-mode="specific">
                             <i class="fas fa-crosshairs"></i>
-                            <span>Specific Server</span>
+                            <span>TARGET SPECIFIC SERVER</span>
                         </div>
                     </div>
                     
                     <div class="buttons">
                         <button id="startBtn" class="btn btn-primary">
-                            <i class="fas fa-play"></i> Start Nuke
+                            <i class="fas fa-rocket"></i> INITIATE NUKE
                         </button>
                         <button id="stopBtn" class="btn btn-danger" disabled>
-                            <i class="fas fa-stop"></i> Stop
+                            <i class="fas fa-stop-circle"></i> ABORT
                         </button>
                         <button id="clearBtn" class="btn btn-secondary">
-                            <i class="fas fa-broom"></i> Clear Logs
+                            <i class="fas fa-trash-alt"></i> CLEAR LOGS
                         </button>
                     </div>
                     
                     <div class="warning-box">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>WARNING: This action is irreversible. Use responsibly.</span>
+                        <i class="fas fa-radiation"></i>
+                        <span>WARNING: THIS ACTION IS PERMANENT AND IRREVERSIBLE. USE AT YOUR OWN RISK.</span>
                     </div>
                 </div>
                 
                 <div class="status-panel">
                     <div class="panel-header">
-                        <h2><i class="fas fa-chart-bar"></i> Status</h2>
+                        <h2><i class="fas fa-chart-network"></i> SYSTEM STATUS</h2>
                         <div class="status-indicator" id="statusIndicator">
                             <span class="status-dot idle"></span>
                             <span class="status-text">IDLE</span>
@@ -614,7 +922,7 @@
                     
                     <div class="progress-container">
                         <div class="progress-label">
-                            <span>Operation Progress</span>
+                            <span>OPERATION PROGRESS</span>
                             <span id="progressPercent">0%</span>
                         </div>
                         <div class="progress-bar">
@@ -623,30 +931,56 @@
                     </div>
                     
                     <div class="current-action">
-                        <h3>Current Action</h3>
-                        <div class="action-text" id="currentAction">Waiting for input...</div>
+                        <h3>CURRENT ACTION</h3>
+                        <div class="action-text" id="currentAction">AWAITING INPUT...</div>
                     </div>
                     
                     <div class="current-server">
-                        <h3>Current Server</h3>
-                        <div class="server-text" id="currentServer">None</div>
+                        <h3>TARGET SERVER</h3>
+                        <div class="server-text" id="currentServer">NONE SELECTED</div>
+                    </div>
+                    
+                    <div class="stats">
+                        <h3>OPERATION STATS</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="statBanned">0</div>
+                                <div class="stat-label">BANNED</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="statChannels">0</div>
+                                <div class="stat-label">CHANNELS</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="statRoles">0</div>
+                                <div class="stat-label">ROLES</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="statCreated">0</div>
+                                <div class="stat-label">CREATED</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="logs-panel">
                 <div class="panel-header">
-                    <h2><i class="fas fa-terminal"></i> Logs</h2>
+                    <h2><i class="fas fa-scroll"></i> SYSTEM LOGS</h2>
                     <div class="log-controls">
                         <button id="autoScrollBtn" class="btn-icon active">
-                            <i class="fas fa-magnet"></i> Auto-scroll
+                            <i class="fas fa-magnet"></i> AUTO-SCROLL
                         </button>
                     </div>
                 </div>
                 <div class="logs-container" id="logsContainer">
                     <div class="log-entry info">
-                        <span class="log-time">00:00:00</span>
-                        <span class="log-message">System initialized. Ready to start.</span>
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-message">SYSTEM INITIALIZED. TROYNET v1.2 READY</span>
+                    </div>
+                    <div class="log-entry info">
+                        <span class="log-time">[00:00:00]</span>
+                        <span class="log-message">ENTER BOT TOKEN TO BEGIN NUKER PROTOCOL</span>
                     </div>
                 </div>
             </div>
@@ -655,246 +989,308 @@
         <footer class="footer">
             <div class="footer-content">
                 <div class="made-by">
-                    <i class="fas fa-code"></i> Made by TroyNeT
+                    <i class="fas fa-code"></i> ENGINEERED BY TROYNET
                 </div>
                 <div class="version-info">
-                    Web Interface v1.0 | Updated 1.2
+                    CYBER INTERFACE v1.2 | SIMULATION MODE
                 </div>
             </div>
         </footer>
     </div>
 
     <script>
-        class TroyNetWeb {
+        class TroyNetNuker {
             constructor() {
-                this.statusPollInterval = null;
-                this.autoScroll = true;
-                this.currentMode = 'all';
                 this.status = {
                     running: false,
-                    current_action: '',
+                    currentAction: 'AWAITING INPUT...',
                     progress: 0,
+                    currentServer: 'NONE SELECTED',
                     logs: [],
-                    current_guild: '',
+                    stats: {
+                        banned: 0,
+                        channelsDeleted: 0,
+                        rolesDeleted: 0,
+                        channelsCreated: 0
+                    },
                     completed: false,
-                    error: null
+                    error: null,
+                    autoScroll: true
                 };
                 
-                this.initEventListeners();
-                this.initSimulation();
+                this.currentMode = 'all';
+                this.operationInterval = null;
+                this.init();
             }
             
-            initEventListeners() {
+            init() {
+                this.bindEvents();
+                this.updateDisplay();
+                this.startBackgroundEffects();
+            }
+            
+            bindEvents() {
                 // Toggle token visibility
                 document.getElementById('toggleToken').addEventListener('click', () => {
                     const tokenInput = document.getElementById('token');
-                    const toggleIcon = document.getElementById('toggleToken').querySelector('i');
+                    const icon = document.getElementById('toggleToken').querySelector('i');
                     
                     if (tokenInput.type === 'password') {
                         tokenInput.type = 'text';
-                        toggleIcon.className = 'fas fa-eye-slash';
+                        icon.className = 'fas fa-eye-slash';
                     } else {
                         tokenInput.type = 'password';
-                        toggleIcon.className = 'fas fa-eye';
+                        icon.className = 'fas fa-eye';
                     }
                 });
                 
                 // Mode selector
                 document.querySelectorAll('.mode-option').forEach(option => {
                     option.addEventListener('click', () => {
-                        document.querySelectorAll('.mode-option').forEach(opt => {
-                            opt.classList.remove('active');
-                        });
+                        document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('active'));
                         option.classList.add('active');
                         this.currentMode = option.dataset.mode;
                         
                         const guildIdInput = document.getElementById('guildId');
                         if (this.currentMode === 'specific') {
-                            guildIdInput.placeholder = 'Enter server ID to nuke';
+                            guildIdInput.placeholder = 'Enter target server ID';
                             guildIdInput.disabled = false;
                         } else {
-                            guildIdInput.placeholder = 'Leave empty to nuke all servers';
+                            guildIdInput.placeholder = 'Leave empty for ALL servers';
                             guildIdInput.value = '';
                             guildIdInput.disabled = true;
                         }
+                        
+                        this.addLog(`Mode changed to: ${this.currentMode.toUpperCase()}`, 'info');
                     });
                 });
                 
-                // Set default mode
-                document.querySelector('.mode-option[data-mode="all"]').classList.add('active');
-                
-                // Start button
+                // Start nuke
                 document.getElementById('startBtn').addEventListener('click', () => this.startNuke());
                 
-                // Stop button
+                // Stop nuke
                 document.getElementById('stopBtn').addEventListener('click', () => this.stopNuke());
                 
-                // Clear logs button
+                // Clear logs
                 document.getElementById('clearBtn').addEventListener('click', () => this.clearLogs());
                 
-                // Auto-scroll button
+                // Auto-scroll toggle
                 document.getElementById('autoScrollBtn').addEventListener('click', (e) => {
-                    this.autoScroll = !this.autoScroll;
+                    this.status.autoScroll = !this.status.autoScroll;
                     e.target.classList.toggle('active');
+                    this.addLog(`Auto-scroll ${this.status.autoScroll ? 'ENABLED' : 'DISABLED'}`, 'info');
                 });
                 
                 // Enter key to start
-                document.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !document.getElementById('startBtn').disabled) {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && e.ctrlKey && !document.getElementById('startBtn').disabled) {
                         this.startNuke();
                     }
                 });
             }
             
-            initSimulation() {
-                // Simulate backend status updates
-                setInterval(() => this.updateStatusDisplay(), 1000);
-            }
-            
-            async startNuke() {
+            startNuke() {
                 const token = document.getElementById('token').value.trim();
-                const channelName = document.getElementById('channelName').value.trim() || 'NUKED';
+                const channelName = document.getElementById('channelName').value.trim() || 'NUKED-BY-TROYNET';
                 const guildId = document.getElementById('guildId').value.trim();
                 
                 if (!token) {
-                    this.addLog('Error: Bot token is required', 'error');
+                    this.addLog('ERROR: BOT TOKEN REQUIRED', 'error');
+                    this.showNotification('Token required!', 'error');
                     return;
                 }
                 
-                if (!token.startsWith('MT') && !token.startsWith('Nz') && !token.startsWith('OD')) {
-                    this.addLog('Warning: Token format looks incorrect. Should start with MT, Nz, or OD', 'warning');
+                // Validate token format
+                if (!this.validateToken(token)) {
+                    this.addLog('WARNING: Token format may be invalid', 'warning');
                 }
                 
-                // Disable start button and enable stop button
+                // Disable start button, enable stop button
                 document.getElementById('startBtn').disabled = true;
                 document.getElementById('stopBtn').disabled = false;
                 
                 // Reset status
                 this.status = {
                     running: true,
-                    current_action: 'Initializing bot connection...',
+                    currentAction: 'INITIALIZING...',
                     progress: 0,
+                    currentServer: this.currentMode === 'specific' && guildId ? `SERVER: ${guildId}` : 'ALL SERVERS',
                     logs: [],
-                    current_guild: '',
+                    stats: { banned: 0, channelsDeleted: 0, rolesDeleted: 0, channelsCreated: 0 },
                     completed: false,
-                    error: null
+                    error: null,
+                    autoScroll: this.status.autoScroll
                 };
                 
-                this.addLog('Starting nuke operation...', 'info');
-                this.addLog(`Token: ${token.substring(0, 10)}...${token.substring(token.length - 5)}`, 'info');
-                this.addLog(`Channel name: ${channelName}`, 'info');
+                this.addLog('='.repeat(50), 'info');
+                this.addLog('INITIATING NUKER PROTOCOL v1.2', 'critical');
+                this.addLog(`MODE: ${this.currentMode.toUpperCase()}`, 'info');
+                this.addLog(`TARGET: ${this.status.currentServer}`, 'info');
+                this.addLog(`CHANNEL NAME: ${channelName}`, 'info');
+                this.addLog('='.repeat(50), 'info');
                 
-                if (this.currentMode === 'specific' && guildId) {
-                    this.addLog(`Target server ID: ${guildId}`, 'info');
-                } else {
-                    this.addLog('Target: All servers', 'info');
-                }
+                // Start simulation
+                this.simulateNukeOperation(token, channelName, guildId);
                 
-                // Simulate the nuke process
-                this.simulateNukeProcess(token, channelName, guildId);
+                this.showNotification('Nuke initiated!', 'success');
             }
             
-            simulateNukeProcess(token, channelName, guildId) {
-                const actions = [
-                    { action: 'Connecting to Discord...', delay: 1000, progress: 10 },
-                    { action: 'Fetching server list...', delay: 1500, progress: 20 },
-                    { action: 'Banning members...', delay: 2000, progress: 40 },
-                    { action: 'Deleting channels...', delay: 1500, progress: 60 },
-                    { action: 'Deleting roles...', delay: 1000, progress: 80 },
-                    { action: 'Creating new channels...', delay: 1500, progress: 100 }
+            validateToken(token) {
+                return token.length >= 50 && (token.startsWith('MT') || token.startsWith('Nz') || token.startsWith('OD'));
+            }
+            
+            simulateNukeOperation(token, channelName, guildId) {
+                const steps = [
+                    { action: 'AUTHENTICATING TOKEN...', duration: 1500, progress: 10, log: 'Token validated successfully' },
+                    { action: 'CONNECTING TO DISCORD API...', duration: 2000, progress: 20, log: 'Connection established' },
+                    { action: 'FETCHING SERVER DATA...', duration: 1800, progress: 30, log: 'Servers retrieved' },
+                    { action: 'INITIATING MEMBER BAN WAVE...', duration: 3000, progress: 45, 
+                      update: () => this.updateStat('banned', 42), log: '42 members banned successfully' },
+                    { action: 'DELETING CHANNELS...', duration: 2500, progress: 60, 
+                      update: () => this.updateStat('channelsDeleted', 18), log: '18 channels deleted' },
+                    { action: 'PURGING SERVER ROLES...', duration: 2000, progress: 75, 
+                      update: () => this.updateStat('rolesDeleted', 12), log: '12 roles purged' },
+                    { action: `CREATING "${channelName}" CHANNELS...`, duration: 2800, progress: 90, 
+                      update: () => this.updateStat('channelsCreated', 25), log: '25 channels created' },
+                    { action: 'FINALIZING OPERATION...', duration: 1500, progress: 100, log: 'Operation completed' }
                 ];
                 
-                let currentActionIndex = 0;
+                let currentStep = 0;
                 
-                const executeAction = () => {
-                    if (currentActionIndex >= actions.length || !this.status.running) {
+                const executeStep = () => {
+                    if (!this.status.running || currentStep >= steps.length) {
                         if (this.status.running) {
                             this.status.completed = true;
                             this.status.running = false;
-                            this.status.current_action = 'Nuke completed successfully!';
+                            this.status.currentAction = 'OPERATION COMPLETE';
                             
-                            this.addLog('Nuke operation completed successfully!', 'success');
-                            this.addLog('All targeted servers have been nuked.', 'success');
-                            this.addLog('WARNING: This action is irreversible.', 'warning');
+                            this.addLog('='.repeat(50), 'success');
+                            this.addLog('NUKE PROTOCOL EXECUTED SUCCESSFULLY', 'success');
+                            this.addLog(`STATS: Banned: ${this.status.stats.banned} | Channels: ${this.status.stats.channelsDeleted} | Roles: ${this.status.stats.rolesDeleted} | Created: ${this.status.stats.channelsCreated}`, 'info');
+                            this.addLog('WARNING: This was a simulation only', 'warning');
+                            this.addLog('='.repeat(50), 'success');
                             
                             document.getElementById('startBtn').disabled = false;
                             document.getElementById('stopBtn').disabled = true;
+                            
+                            this.showNotification('Nuke simulation complete!', 'success');
                         }
                         return;
                     }
                     
-                    const currentAction = actions[currentActionIndex];
-                    this.status.current_action = currentAction.action;
-                    this.status.progress = currentAction.progress;
+                    const step = steps[currentStep];
+                    this.status.currentAction = step.action;
+                    this.status.progress = step.progress;
                     
-                    this.addLog(currentAction.action, 'info');
+                    this.addLog(step.action, 'info');
                     
-                    if (currentActionIndex === 2) {
-                        this.addLog('Banned 42 members', 'success');
-                    } else if (currentActionIndex === 3) {
-                        this.addLog('Deleted 15 channels', 'success');
-                    } else if (currentActionIndex === 4) {
-                        this.addLog('Deleted 8 roles', 'success');
-                    } else if (currentActionIndex === 5) {
-                        this.addLog(`Created 25 channels named "${channelName}"`, 'success');
+                    // Execute step update if exists
+                    if (step.update) step.update();
+                    
+                    // Add step log
+                    if (step.log) {
+                        setTimeout(() => {
+                            this.addLog(step.log, 'success');
+                        }, step.duration / 2);
                     }
                     
-                    currentActionIndex++;
+                    // Random glitch effects during operation
+                    if (currentStep > 2) {
+                        this.addGlitchEffect();
+                    }
+                    
+                    currentStep++;
                     
                     if (this.status.running) {
-                        setTimeout(executeAction, currentAction.delay);
+                        setTimeout(executeStep, step.duration);
                     }
                 };
                 
-                // Set initial server name
-                if (this.currentMode === 'specific' && guildId) {
-                    this.status.current_guild = `Server #${guildId}`;
-                } else {
-                    this.status.current_guild = 'Multiple servers';
-                }
-                
-                setTimeout(executeAction, 500);
+                // Start execution
+                setTimeout(executeStep, 500);
+            }
+            
+            updateStat(stat, value) {
+                this.status.stats[stat] = value;
+                document.getElementById(`stat${stat.charAt(0).toUpperCase() + stat.slice(1)}`).textContent = value;
             }
             
             stopNuke() {
                 this.status.running = false;
-                this.status.current_action = 'Stopping nuke operation...';
+                this.status.currentAction = 'ABORTING OPERATION...';
                 
-                this.addLog('Stop command received', 'warning');
-                this.addLog('Nuke operation stopped by user', 'warning');
+                this.addLog('!!! ABORT COMMAND RECEIVED !!!', 'error');
+                this.addLog('Terminating nuke protocol...', 'warning');
                 
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
+                setTimeout(() => {
+                    this.status.currentAction = 'OPERATION ABORTED';
+                    this.addLog('Nuke protocol terminated by user', 'warning');
+                    
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                    
+                    this.showNotification('Operation aborted!', 'warning');
+                }, 1000);
             }
             
             clearLogs() {
+                this.status.logs = [];
                 const logsContainer = document.getElementById('logsContainer');
-                logsContainer.innerHTML = '<div class="log-entry info"><span class="log-time">' + 
-                    this.getCurrentTime() + '</span><span class="log-message">Logs cleared</span></div>';
+                logsContainer.innerHTML = `
+                    <div class="log-entry info">
+                        <span class="log-time">[${this.getCurrentTime()}]</span>
+                        <span class="log-message">LOG CLEARED BY USER</span>
+                    </div>
+                `;
+                this.addLog('Logs cleared successfully', 'info');
             }
             
-            updateStatusDisplay() {
+            addLog(message, type = 'info') {
+                const time = this.getCurrentTime();
+                const logEntry = { time, message, type };
+                this.status.logs.push(logEntry);
+                
+                // Update UI
+                this.updateLogDisplay();
+                
+                // Keep logs manageable
+                if (this.status.logs.length > 100) {
+                    this.status.logs = this.status.logs.slice(-80);
+                }
+            }
+            
+            updateLogDisplay() {
+                const logsContainer = document.getElementById('logsContainer');
+                logsContainer.innerHTML = this.status.logs.map(log => `
+                    <div class="log-entry ${log.type}">
+                        <span class="log-time">[${log.time}]</span>
+                        <span class="log-message">${log.message}</span>
+                    </div>
+                `).join('');
+                
+                // Auto-scroll
+                if (this.status.autoScroll) {
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+            }
+            
+            updateDisplay() {
                 // Update status indicator
                 const statusDot = document.querySelector('.status-dot');
                 const statusText = document.querySelector('.status-text');
-                const statusIndicator = document.getElementById('statusIndicator');
                 
                 if (this.status.running) {
                     statusDot.className = 'status-dot running';
                     statusText.textContent = 'RUNNING';
-                    statusIndicator.style.color = '#10b981';
                 } else if (this.status.error) {
                     statusDot.className = 'status-dot error';
                     statusText.textContent = 'ERROR';
-                    statusIndicator.style.color = '#ef4444';
                 } else if (this.status.completed) {
                     statusDot.className = 'status-dot completed';
-                    statusText.textContent = 'COMPLETED';
-                    statusIndicator.style.color = '#3b82f6';
+                    statusText.textContent = 'COMPLETE';
                 } else {
                     statusDot.className = 'status-dot idle';
                     statusText.textContent = 'IDLE';
-                    statusIndicator.style.color = '#94a3b8';
                 }
                 
                 // Update progress
@@ -902,53 +1298,138 @@
                 document.getElementById('progressFill').style.width = `${this.status.progress}%`;
                 
                 // Update current action
-                document.getElementById('currentAction').textContent = this.status.current_action || 'Waiting...';
+                document.getElementById('currentAction').textContent = this.status.currentAction;
                 
                 // Update current server
-                document.getElementById('currentServer').textContent = this.status.current_guild || 'None';
+                document.getElementById('currentServer').textContent = this.status.currentServer;
                 
-                // Auto-scroll to bottom
-                if (this.autoScroll) {
-                    const logsContainer = document.getElementById('logsContainer');
-                    logsContainer.scrollTop = logsContainer.scrollHeight;
-                }
-            }
-            
-            addLog(message, type = 'info') {
-                const timeString = this.getCurrentTime();
-                
-                const logsContainer = document.getElementById('logsContainer');
-                const logEntry = document.createElement('div');
-                logEntry.className = `log-entry ${type}`;
-                logEntry.innerHTML = `
-                    <span class="log-time">${timeString}</span>
-                    <span class="log-message">${message}</span>
-                `;
-                
-                logsContainer.appendChild(logEntry);
-                
-                // Limit logs to 100 entries
-                const allLogs = logsContainer.querySelectorAll('.log-entry');
-                if (allLogs.length > 100) {
-                    allLogs[0].remove();
-                }
-                
-                // Auto-scroll to bottom
-                if (this.autoScroll) {
-                    logsContainer.scrollTop = logsContainer.scrollHeight;
-                }
+                // Update stats
+                Object.entries(this.status.stats).forEach(([key, value]) => {
+                    const element = document.getElementById(`stat${key.charAt(0).toUpperCase() + key.slice(1)}`);
+                    if (element) {
+                        element.textContent = value;
+                    }
+                });
             }
             
             getCurrentTime() {
                 const now = new Date();
                 return now.toTimeString().split(' ')[0];
             }
+            
+            addGlitchEffect() {
+                const panels = document.querySelectorAll('.control-panel, .status-panel, .logs-panel');
+                panels.forEach(panel => {
+                    if (Math.random() > 0.7) {
+                        panel.style.filter = 'hue-rotate(90deg)';
+                        setTimeout(() => {
+                            panel.style.filter = 'none';
+                        }, 100);
+                    }
+                });
+            }
+            
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                `;
+                
+                // Add styles
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    background: ${type === 'error' ? 'var(--danger)' : type === 'success' ? 'var(--success)' : 'var(--info)'};
+                    color: white;
+                    border-radius: var(--border-radius-sm);
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-family: 'JetBrains Mono', monospace;
+                    z-index: 1000;
+                    animation: slideInRight 0.3s ease;
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+            
+            startBackgroundEffects() {
+                // Add CSS animations
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOutRight {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // Terminal typing effect
+                this.terminalTyping();
+            }
+            
+            terminalTyping() {
+                const messages = [
+                    "> SYSTEM SECURE",
+                    "> PROTOCOLS LOADED",
+                    "> READY FOR DEPLOYMENT",
+                    "> TROYNET v1.2 ACTIVE"
+                ];
+                
+                let messageIndex = 0;
+                const asciiElement = document.querySelector('.terminal-ascii');
+                
+                setInterval(() => {
+                    if (!this.status.running) {
+                        asciiElement.innerHTML = `
+                            > SYSTEM: ${this.status.running ? 'ACTIVE' : 'STANDBY'} | MODE: ${this.currentMode.toUpperCase()} | STATUS: ${this.status.running ? 'RUNNING' : 'READY'}<br>
+                            > ${messages[messageIndex]}<br>
+                            > [${'█'.repeat(20)}] 100%
+                        `;
+                        messageIndex = (messageIndex + 1) % messages.length;
+                    }
+                }, 3000);
+            }
         }
         
-        // Initialize the application when DOM is loaded
+        // Initialize application
         document.addEventListener('DOMContentLoaded', () => {
-            window.troyNet = new TroyNetWeb();
+            window.troyNet = new TroyNetNuker();
+            
+            // Update display every 100ms
+            setInterval(() => {
+                window.troyNet.updateDisplay();
+            }, 100);
+            
+            // Demo token placeholder
+            document.getElementById('token').addEventListener('focus', function() {
+                if (this.value === '') {
+                    this.placeholder = 'e.g., MTA3NDk5NTUxNzU0ODQ4OTYyMA.Gabcdefghijklmnopqrstuvwxyz123456';
+                }
+            });
+            
+            // Add some initial logs
+            setTimeout(() => {
+                window.troyNet.addLog('Welcome to TroyNet Nuker v1.2', 'info');
+                window.troyNet.addLog('Enter bot token and configure settings', 'info');
+                window.troyNet.addLog('Press CTRL+ENTER to initiate nuke protocol', 'warning');
+            }, 1000);
         });
     </script>
 </body>
-                                </html>
+    </html>
